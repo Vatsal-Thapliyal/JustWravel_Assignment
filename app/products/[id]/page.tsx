@@ -1,10 +1,28 @@
+// app/products/[id]/page.tsx
 import Navbar from '@/components/navbar';
 import ProductDetailClient from './product-detail-client';
-import axios from 'axios';
 
 async function getProduct(id: string) {
-  const res = await axios.get(`https://fakestoreapi.com/products/${id}`);
-  return res.data;
+  try {
+    const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'application/json',
+      },
+      // Add cache revalidation to prevent stale data
+      next: { revalidate: 3600 } // Revalidate every hour
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch product: ${res.status}`);
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    // Return a fallback or throw to show error page
+    throw error;
+  }
 }
 
 export default async function ProductDetailPage({
@@ -12,7 +30,6 @@ export default async function ProductDetailPage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  // Await params before accessing properties
   const { id } = await params;
   const product = await getProduct(id);
 

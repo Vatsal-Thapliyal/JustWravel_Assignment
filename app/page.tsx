@@ -1,27 +1,49 @@
 import ProductsClient from "./productsclient";
 import { Product, ProductListingPageProps } from "@/types";
-import axios from "axios";
 
 //fetch products
 async function fetchProducts(): Promise<Product[]> {
-  const res = await axios.get<Product[]>("https://fakestoreapi.com/products");
+  try {
+    const res = await fetch("https://fakestoreapi.com/products", {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'application/json',
+      },
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
 
-  if (!res) {
-    throw new Error("Failed to fetch products");
+    if (!res.ok) {
+      throw new Error(`Failed to fetch products: ${res.status}`);
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return []; // Return empty array as fallback
   }
-
-  return res.data;
 }
 
 //fetch categories
 async function fetchProductCategories(): Promise<string[]> {
-  const res = await axios.get<string[]>("https://fakestoreapi.com/products/categories");
+  try {
+    const res = await fetch("https://fakestoreapi.com/products/categories", {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'application/json',
+      },
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
 
-  if (!res) {
-    throw new Error("Failed to fetch categories");
+    if (!res.ok) {
+      throw new Error(`Failed to fetch categories: ${res.status}`);
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    // Return default categories as fallback
+    return ['electronics', 'jewelery', "men's clothing", "women's clothing"];
   }
-
-  return res.data;
 }
 
 export default async function ProductListingPage({
@@ -35,7 +57,11 @@ export default async function ProductListingPage({
 
   return (
     <>
-      <ProductsClient products={products} currentPage={page} productCategories={categories} />
+      <ProductsClient 
+        products={products} 
+        currentPage={page} 
+        productCategories={categories} 
+      />
     </>
   );
 }
