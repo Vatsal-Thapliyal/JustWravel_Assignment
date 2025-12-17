@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 //fetch products
 async function fetchProducts(): Promise<Product[]> {
   const res = await fetch("https://fakestoreapi.com/products", {
-    cache: "no-store",
+    next: { revalidate: 60 },
   });
 
   if (!res.ok) {
@@ -19,7 +19,7 @@ async function fetchProducts(): Promise<Product[]> {
 //fetch categories
 async function fetchProductCategories(): Promise<string[]> {
   const res = await fetch("https://fakestoreapi.com/products/categories", {
-    cache: "no-store",
+    next: { revalidate: 60 },
   });
 
   if (!res.ok) {

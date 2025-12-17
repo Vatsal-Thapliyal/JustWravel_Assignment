@@ -2,23 +2,41 @@ import Navbar from '@/components/navbar';
 import ProductDetailClient from './product-detail-client';
 
 async function getProduct(id: string) {
-  const res = await fetch(`https://fakestoreapi.com/products/${id}`);
+  try {
+    const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
+      next: { revalidate: 60 },
+    });
 
-  if (!res.ok) {
-    throw new Error('Failed to fetch product');
+    if (!res.ok) {
+      console.error('Failed to fetch product:', res.status);
+      return null;
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error('Product fetch error:', error);
+    return null;
   }
-
-  return res.json();
 }
 
 export default async function ProductDetailPage({
-  params
+  params,
 }: {
-  params: Promise<{ id: string }>
+  params: { id: string };
 }) {
-  // Await params before accessing properties
-  const { id } = await params;
+  const { id } = params;
   const product = await getProduct(id);
+
+  if (!product) {
+    return (
+      <>
+        <Navbar />
+        <p className="p-6 text-center text-red-500">
+          Product not found.
+        </p>
+      </>
+    );
+  }
 
   return (
     <>
