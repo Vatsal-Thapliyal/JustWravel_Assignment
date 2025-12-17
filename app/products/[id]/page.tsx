@@ -1,6 +1,7 @@
-// app/products/[id]/page.tsx
 import Navbar from '@/components/navbar';
 import ProductDetailClient from './product-detail-client';
+
+export const dynamic = 'force-dynamic';
 
 async function getProduct(id: string) {
   try {
@@ -9,8 +10,7 @@ async function getProduct(id: string) {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         'Accept': 'application/json',
       },
-      // Add cache revalidation to prevent stale data
-      next: { revalidate: 3600 } // Revalidate every hour
+      next: { revalidate: 3600 }
     });
 
     if (!res.ok) {
@@ -20,7 +20,6 @@ async function getProduct(id: string) {
     return res.json();
   } catch (error) {
     console.error('Error fetching product:', error);
-    // Return a fallback or throw to show error page
     throw error;
   }
 }

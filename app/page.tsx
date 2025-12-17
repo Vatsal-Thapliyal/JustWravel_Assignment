@@ -1,6 +1,8 @@
 import ProductsClient from "./productsclient";
 import { Product, ProductListingPageProps } from "@/types";
 
+export const dynamic = 'force-dynamic';
+
 //fetch products
 async function fetchProducts(): Promise<Product[]> {
   try {
@@ -9,7 +11,7 @@ async function fetchProducts(): Promise<Product[]> {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         'Accept': 'application/json',
       },
-      next: { revalidate: 3600 } // Cache for 1 hour
+      next: { revalidate: 3600 }
     });
 
     if (!res.ok) {
@@ -19,7 +21,7 @@ async function fetchProducts(): Promise<Product[]> {
     return res.json();
   } catch (error) {
     console.error("Error fetching products:", error);
-    return []; // Return empty array as fallback
+    return [];
   }
 }
 

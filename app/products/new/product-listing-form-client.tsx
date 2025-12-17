@@ -1,4 +1,3 @@
-// app/products/new/product-listing-form-client.tsx
 'use client';
 
 import { useState } from 'react';
@@ -7,7 +6,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Product } from '@/types';
 
-/* ------------------ Zod Schema ------------------ */
+//Zod Schema
 const productSchema = z.object({
   title: z
     .string()
@@ -60,7 +59,7 @@ export default function ProductListingFormClient({
 
   const imageUrl = watch('image');
 
-  /* ------------------ Submit ------------------ */
+  // Submit handler
   const onSubmit = async (data: ProductFormData) => {
     setSubmitSuccess(false);
     setSavedProduct(null);
