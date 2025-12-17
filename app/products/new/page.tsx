@@ -3,6 +3,9 @@
 
 import Navbar from '@/components/navbar';
 import ProductListingFormClient from './product-listing-form-client';
+
+export const dynamic = 'force-dynamic';
+
 async function getCategories() {
   try {
     const res = await fetch('https://fakestoreapi.com/products/categories', {

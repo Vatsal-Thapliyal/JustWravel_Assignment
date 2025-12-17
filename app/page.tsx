@@ -1,6 +1,8 @@
 import ProductsClient from "./productsclient";
 import { Product, ProductListingPageProps } from "@/types";
 
+export const dynamic = 'force-dynamic';
+
 //fetch products
 async function fetchProducts(): Promise<Product[]> {
   const res = await fetch("https://fakestoreapi.com/products", {
