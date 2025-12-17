@@ -1,70 +1,27 @@
 import ProductsClient from "./productsclient";
 import { Product, ProductListingPageProps } from "@/types";
+import axios from "axios";
 
-export const dynamic = 'force-dynamic';
-
-// Fetch products with retry logic
+//fetch products
 async function fetchProducts(): Promise<Product[]> {
-  const maxRetries = 3;
-  let lastError;
+  const res = await axios.get<Product[]>("https://fakestoreapi.com/products");
 
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      const res = await fetch("https://fakestoreapi.com/products", {
-        next: { revalidate: 60 },
-        signal: AbortSignal.timeout(10000), // 10 second timeout
-      });
-
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-      }
-
-      return res.json();
-    } catch (error) {
-      lastError = error;
-      console.error(`Attempt ${i + 1} failed:`, error);
-      
-      // Wait before retrying (exponential backoff)
-      if (i < maxRetries - 1) {
-        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
-      }
-    }
+  if (!res) {
+    throw new Error("Failed to fetch products");
   }
 
-  console.error("Failed to fetch products after retries:", lastError);
-  return []; // Return empty array as fallback
+  return res.data;
 }
 
-// Fetch categories with retry logic
+//fetch categories
 async function fetchProductCategories(): Promise<string[]> {
-  const maxRetries = 3;
-  let lastError;
+  const res = await axios.get<string[]>("https://fakestoreapi.com/products/categories");
 
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      const res = await fetch("https://fakestoreapi.com/products/categories", {
-        next: { revalidate: 60 },
-        signal: AbortSignal.timeout(10000), // 10 second timeout
-      });
-
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-      }
-
-      return res.json();
-    } catch (error) {
-      lastError = error;
-      console.error(`Attempt ${i + 1} failed:`, error);
-      
-      // Wait before retrying (exponential backoff)
-      if (i < maxRetries - 1) {
-        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
-      }
-    }
+  if (!res) {
+    throw new Error("Failed to fetch categories");
   }
 
-  console.error("Failed to fetch categories after retries:", lastError);
-  return []; // Return empty array as fallback
+  return res.data;
 }
 
 export default async function ProductListingPage({
@@ -73,19 +30,12 @@ export default async function ProductListingPage({
   const resolvedSearchParams = await searchParams;
   const page = parseInt(resolvedSearchParams?.page ?? "1", 10);
 
-  // Fetch both in parallel
-  const [products, categories] = await Promise.all([
-    fetchProducts(),
-    fetchProductCategories(),
-  ]);
+  const products = await fetchProducts();
+  const categories = await fetchProductCategories();
 
   return (
     <>
-      <ProductsClient 
-        products={products} 
-        currentPage={page} 
-        productCategories={categories} 
-      />
+      <ProductsClient products={products} currentPage={page} productCategories={categories} />
     </>
   );
 }

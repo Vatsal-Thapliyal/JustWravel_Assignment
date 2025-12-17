@@ -1,23 +1,16 @@
+// app/products/new/page.tsx
+// SERVER COMPONENT
+
 import Navbar from '@/components/navbar';
 import ProductListingFormClient from './product-listing-form-client';
-
-export const dynamic = 'force-dynamic';
+import axios from 'axios';
 
 async function getCategories(): Promise<string[]> {
   try {
-    const res = await fetch(
-      'https://fakestoreapi.com/products/categories',
-      {
-        next: { revalidate: 60 }, // ✅ ISR
-      }
-    );
+    const res = await axios.get<string[]>(
+      'https://fakestoreapi.com/products/categories');
 
-    if (!res.ok) {
-      console.error('Failed to fetch categories:', res.status);
-      return [];
-    }
-
-    return res.json();
+    return res.data;
   } catch (error) {
     console.error('Error fetching categories:', error);
     return [];

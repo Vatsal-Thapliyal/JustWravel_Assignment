@@ -1,42 +1,20 @@
 import Navbar from '@/components/navbar';
 import ProductDetailClient from './product-detail-client';
+import axios from 'axios';
 
 async function getProduct(id: string) {
-  try {
-    const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
-      next: { revalidate: 60 },
-    });
-
-    if (!res.ok) {
-      console.error('Failed to fetch product:', res.status);
-      return null;
-    }
-
-    return res.json();
-  } catch (error) {
-    console.error('Product fetch error:', error);
-    return null;
-  }
+  const res = await axios.get(`https://fakestoreapi.com/products/${id}`);
+  return res.data;
 }
 
 export default async function ProductDetailPage({
-  params,
+  params
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>
 }) {
-  const { id } = params;
+  // Await params before accessing properties
+  const { id } = await params;
   const product = await getProduct(id);
-
-  if (!product) {
-    return (
-      <>
-        <Navbar />
-        <p className="p-6 text-center text-red-500">
-          Product not found.
-        </p>
-      </>
-    );
-  }
 
   return (
     <>
